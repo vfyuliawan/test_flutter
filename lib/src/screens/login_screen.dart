@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, duplicate_ignore
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, duplicate_ignore, deprecated_member_use
 
 part of 'screens.dart';
 
@@ -10,21 +10,25 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final _myController = TextEditingController();
-  String name = '';
-  final _myPass = TextEditingController();
+  final _myEmailController = TextEditingController();
+  String email = '';
+  final _myPassController = TextEditingController();
   String pass = '';
   bool isError = false;
+  bool isLoginProcessing = false;
+  final _emailController = TextEditingController();
+  bool isPassword = true;
+  final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 
   Widget _buildMyform(hint1, hint2) {
     return Column(
       children: [
         TextField(
-          controller: _myController,
+          controller: _myEmailController,
           autofocus: false,
           onChanged: (value) {
             setState(() {
-              name = value;
+              email = value;
             });
           },
           decoration:
@@ -33,15 +37,31 @@ class _LoginState extends State<Login> {
         ),
         TextField(
           autofocus: false,
-          controller: _myPass,
+          controller: _myPassController,
           onChanged: (value) {
             setState(() {
               pass = value;
             });
           },
-          decoration:
-              InputDecoration(label: Text(hint2), icon: Icon(Icons.password)),
-          obscureText: true,
+          decoration: InputDecoration(
+              label: Text(hint2),
+              icon: Icon(Icons.password),
+              suffixIcon: IconButton(
+                  onPressed: () {
+                    if (isPassword) {
+                      setState(() {
+                        isPassword = false;
+                      });
+                    } else {
+                      setState(() {
+                        isPassword = true;
+                      });
+                    }
+                  },
+                  icon: Icon(
+                    Icons.remove_red_eye,
+                  ))),
+          obscureText: isPassword,
         ),
       ],
     );
@@ -63,18 +83,74 @@ class _LoginState extends State<Login> {
     );
   }
 
+  Widget _buildLoginButton() {
+    return Container(
+      width: 350,
+      child: ElevatedButton(
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.pink)),
+          onPressed: () {
+            if (email == 'cang@gmail.com' && pass == '12345') {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => ListScreen()));
+              print('berhasil');
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("Login Success"),
+                    content: Text("Enjoy Shooping"),
+                    actions: [
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Lanjut'))
+                    ],
+                  );
+                },
+              );
+            } else {
+              setState(() {
+                isError = true;
+              });
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("Login Gagal"),
+                    content:
+                        Text("Please Input Correct UserName And Password!!"),
+                  );
+                },
+              );
+            }
+          },
+          child: Text("Login")),
+    );
+  }
+
+  Widget _buildTextField() {
+    return Padding(
+        padding: EdgeInsets.all(10),
+        child: TextField(
+          controller: _emailController,
+        ));
+  }
+
   // Widget _buildButton() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ignore: prefer_const_constructors
-      appBar: AppBar(
-        backgroundColor: Colors.pink,
-        actions: [IconButton(onPressed: null, icon: Icon(Icons.search))],
-        leading: Icon(Icons.home),
-        title: Text("My First AppLication with Salt"),
-      ),
-      body: Column(
+        // ignore: prefer_const_constructors
+        // appBar: AppBar(
+        //   backgroundColor: Colors.pink,
+        //   actions: [IconButton(onPressed: null, icon: Icon(Icons.search))],
+        //   leading: Icon(Icons.home),
+        //   title: Text("My First AppLication with Salt"),
+        // ),
+        body: SingleChildScrollView(
+      child: Column(
         children: [
           _buildLogoHeader(),
           Column(
@@ -113,7 +189,7 @@ class _LoginState extends State<Login> {
                 // ),
                 Container(
                   padding: EdgeInsets.all(20),
-                  child: _buildMyform("Name", "Password"),
+                  child: _buildMyform("Email", "Password"),
                 ),
                 Container(
                   padding: EdgeInsets.only(top: 30),
@@ -137,53 +213,124 @@ class _LoginState extends State<Login> {
                       //       },
                       //       child: Text("Move Page")),
                       // ),
-                      Container(
-                        width: 350,
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.pink)),
-                            onPressed: () {
-                              if (name == 'cang' && pass == '12345') {
+                      // _buildLoginButton(),
+                      ButtonWidget(
+                        caption: 'Login',
+                        isLoading: isLoginProcessing,
+                        onpressed: () async {
+                          //inisial storage
+                          final SharedPreferences storage = await prefs;
+                          setState(() {
+                            isLoginProcessing = true;
+                          });
+                          Future.delayed(
+                            Duration(milliseconds: 1000),
+                            () {
+                              if (email != 'cang@gmail.com' &&
+                                  pass != '12345') {
+                                setState(() {
+                                  isLoginProcessing = false;
+                                });
+                                showTopSnackBar(
+                                  context,
+                                  CustomSnackBar.error(
+                                    message:
+                                        "Your Username and Password Incorrect!!",
+                                  ),
+                                );
+                                storage.setBool("pernah_login", false);
+                              } else {
+                                //simpan session
+                                setState(() {
+                                  isLoginProcessing = false;
+                                });
+                                storage.setBool("pernah_login", true);
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (builder) => ListScreen()));
-                                print('berhasil');
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text("Login Success"),
-                                      content: Text("Enjoy Shooping"),
-                                      actions: [
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Lanjut'))
-                                      ],
-                                    );
-                                  },
-                                );
-                              } else {
-                                setState(() {
-                                  isError = true;
-                                });
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text("Login Gagal"),
-                                      content: Text(
-                                          "Please Input Correct UserName And Password!!"),
-                                    );
-                                  },
-                                );
+                                      builder: (context) => ListScreen(),
+                                    ));
+                                showTopSnackBar(
+                                    context,
+                                    CustomSnackBar.success(
+                                      message:
+                                          "Login Success Happy Shoping Day!!",
+                                    ));
+
+                                // showDialog(
+                                //     context: context,
+                                //     builder: (BuildContext context) {
+                                //       return Dialog(
+                                //         shape: RoundedRectangleBorder(
+                                //             borderRadius:
+                                //                 BorderRadius.circular(
+                                //                     20.0)), //this right here
+                                //         child: Container(
+                                //           height: 200,
+                                //           child: Padding(
+                                //             padding:
+                                //                 const EdgeInsets.all(12.0),
+                                //             child: Column(
+                                //               mainAxisAlignment:
+                                //                   MainAxisAlignment.center,
+                                //               crossAxisAlignment:
+                                //                   CrossAxisAlignment.start,
+                                //               children: [
+                                //                 TextField(
+                                //                   decoration: InputDecoration(
+                                //                       border:
+                                //                           InputBorder.none,
+                                //                       hintText:
+                                //                           'Do you wanna still login?'),
+                                //                 ),
+                                //                 SizedBox(
+                                //                   width: 320.0,
+                                //                   child: ElevatedButton(
+                                //                     onPressed: () {
+                                //                       Navigator.push(
+                                //                           context,
+                                //                           MaterialPageRoute(
+                                //                               builder:
+                                //                                   (builder) =>
+                                //                                       ListScreen()));
+                                //                     },
+                                //                     child: Text(
+                                //                       "Still Login",
+                                //                       style: TextStyle(
+                                //                           color:
+                                //                               Colors.white),
+                                //                     ),
+                                //                   ),
+                                //                 ),
+                                //                 SizedBox(
+                                //                   width: 320.0,
+                                //                   child: ElevatedButton(
+                                //                     style: ElevatedButton
+                                //                         .styleFrom(
+                                //                             primary:
+                                //                                 Colors.red),
+                                //                     onPressed: () {
+                                //                       Navigator.of(context)
+                                //                           .pop();
+                                //                     },
+                                //                     child: Text(
+                                //                       "Exit",
+                                //                       style: TextStyle(
+                                //                           color:
+                                //                               Colors.white),
+                                //                     ),
+                                //                   ),
+                                //                 )
+                                //               ],
+                                //             ),
+                                //           ),
+                                //         ),
+                                //       );
+                                //     });
                               }
                             },
-                            child: Text("Login")),
+                          );
+                        },
                       ),
                       RichText(
                           text: TextSpan(
@@ -259,6 +406,6 @@ class _LoginState extends State<Login> {
           )
         ],
       ),
-    );
+    ));
   }
 }

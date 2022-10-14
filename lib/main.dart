@@ -16,6 +16,7 @@
 import 'package:belajar_flutter/src/app.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(App());
 }

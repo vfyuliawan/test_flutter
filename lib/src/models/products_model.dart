@@ -13,7 +13,7 @@ List<ProductsModels> productModels = [
   ProductsModels(
       "iphone 14 pro max",
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      "https://dummyjson.com/image/i/products/1/1.jpg",
+      "https://dummyjson.com/image/i/products/2/1.jpg",
       301),
   ProductsModels(
       "Acer",
@@ -38,7 +38,7 @@ List<ProductsModels> productModels = [
   ProductsModels(
       "Samsung Note",
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      "https://dummyjson.com/image/i/products/8/2.jpg",
+      "https://dummyjson.com/image/i/products/8/1.jpg",
       401),
   ProductsModels(
       "Samsung Galaxy",

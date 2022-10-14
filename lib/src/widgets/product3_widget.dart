@@ -1,20 +1,22 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers
 
 part of 'widgetes.dart';
 
-class ProductWidget extends StatelessWidget {
-  final ProductsModels data;
-  const ProductWidget({super.key, required this.data});
+class ProductWidget3 extends StatelessWidget {
+  final ProductModel data;
+  const ProductWidget3({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        splashColor: Colors.orange,
-        onLongPress: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (builder) => DetilProduct()));
-        },
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailProductScreen(productId: data.id!),
+            ));
+      },
+      child: Card(
         child: Container(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -24,9 +26,9 @@ class ProductWidget extends StatelessWidget {
                   height: 180,
                   margin: EdgeInsets.all(8),
                   child: Image(
-                      fit: BoxFit.cover, image: NetworkImage(data.imageUrl))),
+                      fit: BoxFit.cover, image: NetworkImage("${data.image}"))),
               Text(
-                data.productname.toUpperCase(),
+                "${data.title}",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Row(
@@ -40,7 +42,7 @@ class ProductWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              Text(data.productDesc),
+              Text("${data.description}"),
               Row(
                 children: [
                   Icon(

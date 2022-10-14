@@ -10,11 +10,10 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "My First flutter with Salt Accademy",
-      home: Login(),
+      home: SplashScreen(),
       theme: ThemeData(
           appBarTheme: AppBarTheme(
-              backgroundColor: Colors.orange.shade900,
-              foregroundColor: Colors.white)),
+              backgroundColor: Colors.pink, foregroundColor: Colors.white)),
     );
   }
 }
