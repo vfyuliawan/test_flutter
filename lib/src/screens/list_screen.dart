@@ -37,12 +37,34 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   void showNotif() {
-    notifService.showNotif("Tahu Bulat");
+    notifService.showNotifBirthday('Ada Promo nich buat kamu',
+        'Mens Casual Slim Fit yang kamu inginkan turun harga 70%', '3');
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Notif akan muncul setelah 10 detik')));
+  }
+
+  void onDidReceiveNotificationResponse(
+      NotificationResponse notificationResponse) async {
+    final String? payload = notificationResponse.payload;
+    if (notificationResponse.payload != null) {
+      debugPrint('notification payload: $payload');
+    }
+
+    //Fungsi masuk ke halaman detail
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+          builder: (context) => DetailProductScreen(
+                productId: int.parse(payload!),
+              )),
+    );
   }
 
   @override
   void initState() {
-    notifService.init((p0, p1, p2, p3) => onReceiveNotif(p0, p1, p3));
+    BlocProvider.of<ProductBloc>(context).add(FetchProductAPI());
+    notifService.init((p0, p1, p2, p3) => onReceiveNotif(p0, p1, p3),
+        onDidReceiveNotificationResponse);
     super.initState();
   }
 
@@ -76,6 +98,8 @@ class _ListScreenState extends State<ListScreen> {
             actions: [
               Row(
                 children: [
+                  IconButton(
+                      onPressed: showNotif, icon: const Icon(Icons.person)),
                   Container(
                     // padding: EdgeInsets.only(bottom: 2, top: 2),
                     width: 130,
@@ -155,8 +179,8 @@ class _ListScreenState extends State<ListScreen> {
             : (bottomNavbarIndex == 1)
                 ? GirdProduct()
                 : (bottomNavbarIndex == 2)
-                    ? Playlist()
-                    : ListProducts2());
+                    ? ListProduct3()
+                    : ListProduct3());
   }
 }
 
@@ -534,6 +558,37 @@ class ListProducts2 extends StatelessWidget {
                 crossAxisCount: 2, childAspectRatio: 6 / 16),
             itemBuilder: (context, index) {
               return ProductWidget3(data: products[index]);
+            },
+          );
+        }
+        return Container();
+      },
+    );
+  }
+}
+
+class ListProduct3 extends StatelessWidget {
+  const ListProduct3({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<ProductBloc, ProductState>(
+      listener: (context, state) {
+        if (state is ProductIsFailed) {
+          print("Is Failed");
+        }
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        if (state is ProductIsLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (state is ProductIsSuccess) {
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, childAspectRatio: 6 / 16),
+            itemBuilder: (context, index) {
+              return ProductWidget3(data: state.data[index]);
             },
           );
         }
