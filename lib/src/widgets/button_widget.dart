@@ -38,7 +38,7 @@ class ButtonWidget extends StatelessWidget {
         style: ElevatedButton.styleFrom(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            primary: Colors.pink,
+            primary: Colors.blueAccent,
             elevation: 0),
       ),
     );
